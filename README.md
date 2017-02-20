@@ -21,6 +21,7 @@ Or install it yourself as:
 ## Usage
 Using the executable `nlr` is the preferred way:
 
+```
 Usage: nlr [OPTIONS]
 
 Mandatory:
@@ -37,6 +38,7 @@ Optional:
     -s, --scheme SCHEME              The protocol scheme to use. Default http.
     -v, --verbose                    The protocol scheme to use. Default false.
     -h, --help                       Show this message
+```
 
 ## Contributing
 
