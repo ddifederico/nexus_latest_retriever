@@ -1,0 +1,56 @@
+#!/usr/bin/env ruby
+
+require 'nexus_latest_retriever'
+require 'optparse'
+require 'open-uri'
+require 'nokogiri'
+
+args = {
+  artifact_id: nil,
+  classifier: nil,
+  extension: 'jar',
+  group_id: nil,
+  host: nil,
+  output: nil,
+  port: 80,
+  repository: nil,
+  scheme: 'http',
+  verbose: false
+}
+
+optparse = OptionParser.new do |opts|
+  opts.banner = "Usage: #{File.basename(__FILE__)} OPTIONS"
+
+  opts.separator ""
+  opts.separator "Mandatory:"
+  opts.on('-a', '--artifact-id ARTIFACT_ID', 'The artifactId of the package to find.') { |o| args[:artifact_id] = o }
+  opts.on('-g', '--group-id GROUP_ID', 'The groupId of the package to find.') { |o| args[:group_id] = o }
+  opts.on('-n', '--nexus NEXUS_HOST', 'Nexus host.') { |o| args[:host] = o }
+  opts.on('-r', '--repository REPOSITORY', 'The repository to use to find the package.') { |o| args[:repository] = o }
+
+  opts.separator ""
+  opts.separator "Optional:"
+
+  opts.on('-c', '--classifier CLASSIFIER', 'The package classifier to find. Default: no classifier.') { |o| args[:classifier] = o }
+  opts.on('-e', '--extension EXTENSION', "The package extension to find. Default: #{args[:extension]}") { |o| args[:extension] = o }
+  opts.on('-o', '--output OUTPUT', "The output file. Default: original filename") { |o| args[:output] = o }
+  opts.on('-p', '--port PORT', "Nexus port. Default #{args[:port]}.") { |o| args[:port] = oi.to_i }
+  opts.on('-s', '--scheme SCHEME', "The protocol scheme to use. Default #{args[:scheme]}.") { |o| args[:scheme] = o }
+  opts.on('-v', '--verbose', "The protocol scheme to use. Default #{args[:verbose]}.") { |o| args[:verbose] = true }
+
+  opts.on_tail("-h", "--help", "Show this message") do
+    puts opts
+    puts
+    puts "Example: #{File.basename(__FILE__)} -n nexus.com -g com.piksel.customer -a foo -r lib-snapshots-local"
+    exit
+  end
+end
+optparse.parse!
+
+def print_usage(parser)
+  puts parser.help; exit 1
+end
+
+print_usage(optparse) unless args[:artifact_id] and args[:group_id] and args[:host] and args[:repository]
+
+NexusLatestRetriever.retrieve(args)
