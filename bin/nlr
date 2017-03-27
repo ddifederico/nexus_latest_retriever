@@ -33,6 +33,8 @@ optparse = OptionParser.new do |opts|
 
   opts.on('-c', '--classifier CLASSIFIER', 'The package classifier to find. Default: no classifier.') { |o| args[:classifier] = o }
   opts.on('-e', '--extension EXTENSION', "The package extension to find. Default: #{args[:extension]}") { |o| args[:extension] = o }
+  opts.on('--username USERNAME', 'The username to use as part of Nexus authentication.') { |o| args[:username] = o }
+  opts.on('--password PASSWORD', 'The password to use as part of Nexus authentication.') { |o| args[:password] = o }
   opts.on('-o', '--output OUTPUT', "The output file. Default: original filename") { |o| args[:output] = o }
   opts.on('-p', '--port PORT', "Nexus port. Default #{args[:port]}.") { |o| args[:port] = oi.to_i }
   opts.on('-s', '--scheme SCHEME', "The protocol scheme to use. Default #{args[:scheme]}.") { |o| args[:scheme] = o }
@@ -52,5 +54,6 @@ def print_usage(parser)
 end
 
 print_usage(optparse) unless args[:artifact_id] and args[:group_id] and args[:host] and args[:repository]
+print_usage(optparse) if (args[:username] and !args[:password]) or (args[:password] and !args[:username])
 
 NexusLatestRetriever.retrieve(args)

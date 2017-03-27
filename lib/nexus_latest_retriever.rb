@@ -19,7 +19,7 @@ module NexusLatestRetriever
     url = common_url + "/maven-metadata.xml"
 
     puts "Opening url: #{url}" if opts[:verbose]
-    meta = Nokogiri::XML(open(url))
+    meta = Nokogiri::XML(open_url(url, opts))
     release = false
 
     release_version = meta.at_xpath("/metadata/versioning/release/text()")
@@ -41,7 +41,7 @@ module NexusLatestRetriever
       url = "#{common_url}/#{versions.last}/maven-metadata.xml"
 
       puts "Opening url: #{url}" if opts[:verbose]
-      meta = Nokogiri::XML(open(url))
+      meta = Nokogiri::XML(open_url(url, opts))
 
       xpath = "/metadata/versioning/snapshotVersions/snapshotVersion[./extension/text()='#{opts[:extension]}'"
       xpath += " and ./classifier/text()='#{opts[:classifier]}'" if opts[:classifier]
@@ -67,11 +67,20 @@ module NexusLatestRetriever
     begin
       File.open(output, "wb") do |file|
         puts "Saving artifact to: #{output}"
-        file.write open(url).read
+        file.write open_url(url, opts).read
       end
     rescue => e
       File.delete(output) if File.exist?(output)
       raise e
+    end
+  end
+
+  private
+  def self.open_url(url, opts)
+    if opts[:username] and opts[:password]
+      open(url, http_basic_authentication: [opts[:username], opts[:password]])
+    else
+      open(url)
     end
   end
 end
